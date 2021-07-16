@@ -1,1 +1,10 @@
+# macOS
 .DS_Store
+
+# Node
+node_modules
+
+# Project
+.secret.json
+flow.json
+temporary
