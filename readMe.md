@@ -58,3 +58,40 @@
 ## Day 5
 
 - Testnet
+
+# Flow CLI
+
+```sh
+flow emulator start
+```
+
+```sh
+flow keys generate --sig-algo "ECDSA_secp256k1"
+```
+
+```sh
+flow accounts create \
+  --key "2824549ffffe11edc1e170f0c1186b9a588444812cdfe9ec0c93df8b858679c0afb4f006a7c273c0fdd18f62e3632fb3f984a682a928fe3c2c82d845a1245137" \
+  --sig-algo "ECDSA_secp256k1" \
+  --signer "emulator-account"
+```
+
+```sh
+flow transactions build ./transactions/test.cdc \
+  --authorizer owner \
+  --proposer owner \
+  --payer owner \
+  --filter payload \
+  --save test.rlp
+```
+
+```sh
+flow transactions sign ./test.rlp \
+  --signer owner \
+  --filter payload \
+  --save test.signed.rlp
+```
+
+```sh
+flow transactions send-signed ./test.signed.rlp
+```
