@@ -42,6 +42,7 @@ pub resource Printer {
     self.prints = []
   }
 
+  // possible synonyms for the word "canvas"
   pub fun print(canvas: String): @Picture? {
     // Canvas needs to fit Printer's dimensions.
     if canvas.length != Int(self.width * self.height) {
@@ -65,6 +66,16 @@ pub resource Printer {
   }
 }
 
+// String array serializer.
+pub fun serializeStringArray(_ lines: [String]): String {
+  var buffer = ""
+  for line in lines {
+    buffer = buffer.concat(line)
+  }
+
+  return buffer
+}
+
 // A helper function to display how each picture looks.
 pub fun display(pictureRef: &Picture) {
   var iteration: Int8 = -1
@@ -84,8 +95,15 @@ pub fun main() {
   // " " - offPixel
   let printer <- create Printer(width: 5, height: 5, onPixel: 42, offPixel: 32)
 
-  let letterX = "*   * * *   *   * * *   *";
-  let pictureX <- printer.print(canvas: letterX)!
+  let canvasX: [String] = [
+    "*   *",
+    " * * ",
+    "  *  ",
+    " * * ",
+    "*   *"
+  ]
+  
+  let pictureX <- printer.print(canvas: serializeStringArray(canvasX))!
   let pictureXRef: &Picture = &pictureX as &Picture
 
   display(pictureRef: pictureXRef)
@@ -97,11 +115,18 @@ pub fun main() {
   // "|*   *|"
   // "+-----+"
 
-  let pictureXDuplicate <- printer.print(canvas: letterX)
+  let pictureXDuplicate <- printer.print(canvas: serializeStringArray(canvasX))
   log(pictureXDuplicate == nil)
   // true
 
-  let pictureOne <- printer.print(canvas: "   *   **  * *    *    * ")!
+  let canvasOne = [
+    "   * ",
+    "  ** ",
+    " * * ",
+    "   * ",
+    "   * "
+  ]
+  let pictureOne <- printer.print(canvas: serializeStringArray(canvasOne))!
   let pictureOneRef: &Picture = &pictureOne as &Picture
   display(pictureRef: pictureOneRef)
   // "+-----+"
