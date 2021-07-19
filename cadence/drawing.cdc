@@ -137,9 +137,16 @@ pub fun main() {
   // "|   * |"
   // "+-----+"
 
-  destroy pictureX
+  let pictures: @[Picture] <- []
+
+  pictures.append(<- pictureX)
+  pictures.append(<- pictureOne)
+
+  let picturesRef = &pictures as &[Picture]
+
+  destroy pictures
+
   destroy pictureXDuplicate
-  destroy pictureOne
 
   destroy printer
 }
