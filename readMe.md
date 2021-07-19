@@ -95,3 +95,27 @@ flow transactions sign ./test.rlp \
 ```sh
 flow transactions send-signed ./test.signed.rlp
 ```
+
+# Cadence Quirks
+
+## 1. Iterating over a reference to an array
+
+Initial idea
+
+```
+let numbers = [1, 2, 3]
+let numbersRef = &numbers as &[Int]
+for number in numbersRef {
+  log(number)
+}
+```
+
+Produces `expected array, got "&[Int]"`. This trick below works.
+
+```
+let numbers = [1, 2, 3]
+let numbersRef = &numbers as &[Int]
+for number in numbersRef.concat([]) {
+  log(number)
+}
+```
