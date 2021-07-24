@@ -1,10 +1,10 @@
 pub contract Artist {
 
-  pub event ArtistPrinterCreated()
-  pub event ArtistPicturePrintSuccess(pixels: String)
-  pub event ArtistPicturePrintFailure(pixels: String)
-  pub event ArtistPictureDeposit(pixels: String)
-  pub event ArtistCollectionCreated()
+  pub event PrinterCreated()
+  pub event PicturePrintSuccess(pixels: String)
+  pub event PicturePrintFailure(pixels: String)
+  pub event PictureDeposit(pixels: String)
+  pub event CollectionCreated()
 
   // A structure that will store a two dimensional canvas made up of ASCII
   // characters (usually one character to indicate an on pixel, and one for off).
@@ -49,7 +49,7 @@ pub contract Artist {
     pub fun deposit(picture: @Picture) {
       let pixels = picture.canvas.pixels
       self.pictures.append(<- picture)
-      emit ArtistPictureDeposit(pixels: pixels)
+      emit PictureDeposit(pixels: pixels)
     }
     pub fun getCanvases(): [Canvas] {
       var canvases: [Canvas] = []
@@ -73,7 +73,7 @@ pub contract Artist {
   }
 
   pub fun createCollection(): @Collection {
-    emit ArtistCollectionCreated()
+    emit CollectionCreated()
     return <- create Collection()
   }
 
@@ -110,11 +110,11 @@ pub contract Artist {
         let picture <- create Picture(canvas: canvas)
         self.prints.append(canvas.pixels)
 
-        emit ArtistPicturePrintSuccess(pixels: canvas.pixels)
+        emit PicturePrintSuccess(pixels: canvas.pixels)
 
         return <- picture
       } else {
-        emit ArtistPicturePrintFailure(pixels: pixels)
+        emit PicturePrintFailure(pixels: pixels)
         return nil
       }
     }
@@ -125,7 +125,7 @@ pub contract Artist {
       <- create Printer(width: 5, height: 5),
       to: /storage/PicturePrinter
     )
-    emit ArtistPrinterCreated()
+    emit PrinterCreated()
     self.account.link<&Printer>(
       /public/PicturePrinter,
       target: /storage/PicturePrinter
