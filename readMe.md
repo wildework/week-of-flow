@@ -119,3 +119,7 @@ for number in numbersRef.concat([]) {
   log(number)
 }
 ```
+
+## 2. Using `--update` with `flow project deploy`
+
+It does not call `init()` a second time on the account.

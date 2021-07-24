@@ -1,4 +1,4 @@
-import HelloWorld from "../contracts/HelloWorld.cdc"
+import HelloWorld from "../contract.cdc"
 
 transaction {
   prepare(account: AuthAccount) {}

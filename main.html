@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .app {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      #display {
+        display: flex;
+        margin: 20px;
+      }
+      #display > svg {
+        margin-right: 10px;
+      }
+      #display > svg:last-child {
+        margin-right: 0;
+      }
+      
+      svg {
+        display: block;
+      }
+      .pixel {
+        fill: #EEEEEE;
+      }
+      .filledPixel {
+        fill: #424242;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <h1>Pictures</h1>
+      <div id="canvasParent"></div>
+      <p id="serializedPicture"></p>
+      <div>
+        <button id="clearButton">clear</button>
+        <button id="addButton">add</button>
+      </div>
+      <div id="display"></div>
+    </div>
+    <script>
+
+      class Frame {
+        get width() {
+          return this.grid.columns * (this.pixel.width + this.pixel.spacing) - this.pixel.spacing;
+        }
+        get height() {
+          return this.grid.rows * (this.pixel.height + this.pixel.spacing) - this.pixel.spacing;
+        }
+        constructor(pixel, grid, isInteractive = false) {
+          this.pixel = pixel;
+          this.grid = grid;
+          this.isInteractive = isInteractive;
+
+          this.onPixelClick = this.onPixelClick.bind(this);
+
+          this.element = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          this.element.setAttribute('viewBox', `0 0 ${this.width} ${this.height}`);
+          this.element.style.width = `${this.width}px`;
+          this.element.style.height = `${this.height}px`;
+
+          var pixelIndex = 0;
+          for (let row = 0; row < grid.rows; row += 1) {
+            for (let column = 0; column < grid.columns; column += 1) {
+              let x = column * (pixel.width + pixel.spacing);
+              let y = row * (pixel.height + pixel.spacing);
+
+              const pixelRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+
+              pixelRect.setAttributeNS(null, 'data-index', pixelIndex);
+              pixelRect.setAttributeNS(null, 'x', x);
+              pixelRect.setAttributeNS(null, 'y', y);
+              pixelRect.setAttributeNS(null, 'width', pixel.width);
+              pixelRect.setAttributeNS(null, 'height', pixel.height);
+              pixelRect.setAttributeNS(null, 'rx', '10');
+              pixelRect.classList.add('pixel');
+
+              // Attach listeners.
+              if (this.isInteractive) {
+                pixelRect.addEventListener('click', this.onPixelClick);
+              }
+
+              this.element.appendChild(pixelRect);
+
+              pixelIndex += 1;
+            }
+          }
+
+          this.picture = null;
+        }
+        cloneIn(parent) {
+          const clone = new Frame(this.pixel, this.grid, false);
+          clone.display(this.picture);
+          clone.attachTo(parent);
+        }
+        attachTo(parent) {
+          parent.appendChild(this.element);
+        }
+        onPixelClick(event) {
+          const pixelIndex = Number.parseInt(event.target.getAttribute('data-index'));
+          this.picture.togglePixelAt(pixelIndex);
+          this.display();
+        }
+        display(nextPicture = null) {
+          if (nextPicture && this.picture !== nextPicture) {
+            this.clear();
+            this.picture = nextPicture;
+            this.element.setAttributeNS(null, 'data-picture', this.picture.serialized);
+          }
+
+          const pixels = this.element.querySelectorAll('rect');
+          for (var index = 0; index < pixels.length; index += 1) {
+            const pixel = pixels[index];
+
+            // Switch pixels on or off.
+            if (this.picture.serialized[index] === '1') {
+              pixel.classList.add('filledPixel');
+            } else {
+              pixel.classList.remove('filledPixel');
+            }
+          }
+        }
+        clear() {
+          this.picture = null;
+          const pixels = this.element.querySelectorAll('rect');
+          for (var index = 0; index < pixels.length; index += 1) {
+            pixels[index].classList.remove('filledPixel');
+          }
+        }
+      }
+
+      class Picture {
+        constructor(serialized) {
+          this.serialized = serialized;
+        }
+        togglePixelAt(index) {
+          this.serialized = (
+            this.serialized.slice(0, index) +
+            (this.serialized[index] === '0' ? '1' : '0') +
+            this.serialized.slice(index + 1, this.serialized.length)
+          );
+        }
+      }
+
+      const frame = new Frame(
+        {
+          width: 80,
+          height: 80,
+          spacing: 4
+        },
+        {
+          rows: 5,
+          columns: 5
+        },
+        true
+      );
+      frame.attachTo(document.querySelector('#canvasParent'));
+      frame.display(new Picture('0000000000000000000000000'));
+
+      // const url = new URL(window.location.href);
+      // const picture = new Picture(url.searchParams.get('picture'));
+      const displayElement = document.querySelector('#display');
+      const smallFrame = new Frame(
+        {
+          width: 10,
+          height: 10,
+          spacing: 2
+        },
+        {
+          rows: 5,
+          columns: 5
+        }
+      );
+      
+      smallFrame.display(new Picture('1111010000111001000010000'));
+      smallFrame.cloneIn(displayElement);
+
+      smallFrame.display(new Picture('1000010000100001000011111'));
+      smallFrame.cloneIn(displayElement);
+
+      smallFrame.display(new Picture('0111010001100011000101110'));
+      smallFrame.cloneIn(displayElement);
+
+      smallFrame.display(new Picture('1000110101101011111101010'));
+      smallFrame.cloneIn(displayElement);
+
+      document.querySelector('#clearButton').addEventListener('click', () => {
+        frame.display(new Picture('0000000000000000000000000'));
+      });
+      document.querySelector('#addButton').addEventListener('click', () => {
+        smallFrame.display(frame.picture);
+        smallFrame.cloneIn(displayElement);
+      });
+    </script>
+  </body>
+</html>

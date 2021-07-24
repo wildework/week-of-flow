@@ -1,4 +1,8 @@
 {
   "name": "week-of-flow",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@onflow/fcl": "^0.0.74",
+    "fastify": "^3.19.1"
+  }
 }
