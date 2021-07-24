@@ -49,20 +49,20 @@ import FlowCLI from './source/FlowCLI.js';
     '10000'
   ];
 
-  await FlowCLI.executeTransaction({
-    transactionPath: './model/Artist/transactions/printPicture.cdc',
-    argsJSON: [
-      {
-        type: 'String',
-        value: letterX.join('')
-      }
-    ],
-    authorizer: 'owner',
-    proposer: 'owner',
-    payer: 'owner',
-    network: 'emulator',
-    showOutput: true
-  });
+  // await FlowCLI.executeTransaction({
+  //   transactionPath: './model/Artist/transactions/printPicture.cdc',
+  //   argsJSON: [
+  //     {
+  //       type: 'String',
+  //       value: letterX.join('')
+  //     }
+  //   ],
+  //   authorizer: 'owner',
+  //   proposer: 'owner',
+  //   payer: 'owner',
+  //   network: 'emulator',
+  //   showOutput: true
+  // });
   // await FlowCLI.executeTransaction({
   //   transactionPath: 'model/PictureNFT/transactions/createCollection.cdc',
   //   authorizer: 'user-testnet',
@@ -70,31 +70,32 @@ import FlowCLI from './source/FlowCLI.js';
   //   payer: 'user-testnet',
   //   network: 'testnet'
   // });
-  await FlowCLI.executeScript({
-    scriptPath: 'model/Artist/scripts/getCanvases.cdc',
-    argsJSON: [
-      {
-        type: 'Address',
-        value: '0x01cf0e2f2f715450'
-      }
-    ],
-    network: 'emulator',
+  // await FlowCLI.executeScript({
+  //   scriptPath: 'model/Artist/scripts/getCanvases.cdc',
+  //   argsJSON: [
+  //     {
+  //       type: 'Address',
+  //       value: '0x01cf0e2f2f715450'
+  //     }
+  //   ],
+  //   network: 'emulator',
+  // });
+
+  const fastify = Fastify({
+    logger: true
   });
 
-  // const fastify = Fastify({
-  //   logger: true
-  // });
-
-  // fastify.get('/', async (request, reply) => {
-  //   reply
-  //     .type('text/html')
-  //     .send(fs.readFileSync('./main.html', 'utf-8'));
-  // });
-  // fastify.listen(3000, '0.0.0.0', (error, address) => {
-  //   if (error) {
-  //     process.exit(1);
-  //   } else {
-  //     // fastify.log.info(`Server listening on ${address}.`);
-  //   }
-  // });
+  fastify.get('/', async (request, reply) => {
+    reply
+      .type('text/html')
+      .send(fs.readFileSync('./main.html', 'utf-8'));
+  });
+  fastify.listen(3200, '0.0.0.0', (error, address) => {
+    if (error) {
+      console.log(error);
+      process.exit(1);
+    } else {
+      fastify.log.info(`Server listening on ${address}.`);
+    }
+  });
 })();
